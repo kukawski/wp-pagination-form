@@ -12,7 +12,7 @@ function wp_pagination_form () {
   global $wp_query;
   $posts_per_page = intval(get_query_var('posts_per_page'));
   $pages_count = absint($wp_query->max_num_pages);
-  $current_page = max(1, absint(get_query_var('paged')));
+  $current_page = min(max(1, absint(get_query_var('paged', 1))), $pages_count);
 
   previous_posts_link();
   ?><form method="get" action="">
