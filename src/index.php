@@ -8,15 +8,23 @@ Author URI: https://kukawski.net
 Text Domain: wp-pagination-form
 */
 
+add_action('init', function () {
+  if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['go_to_page'])) {
+    wp_redirect(get_pagenum_link($_POST['go_to_page']));
+    exit;
+  }
+});
+
 function wp_pagination_form () {
   global $wp_query;
+
   $posts_per_page = intval(get_query_var('posts_per_page'));
   $pages_count = absint($wp_query->max_num_pages);
   $current_page = min(max(1, absint(get_query_var('paged', 1))), $pages_count);
 
   previous_posts_link();
-  ?><form method="get" action="">
-    Page <input name="paged" value="<?=$current_page?>" size="<?=floor(log10(abs($pages_count))) + 1?>"> of <?=$pages_count?>
+  ?><form method="post" action="">
+    Page <input name="go_to_page" value="<?=$current_page?>" size="<?=floor(log10(abs($pages_count))) + 1?>"> of <?=$pages_count?>
     </form><?php
   next_posts_link();
 }
