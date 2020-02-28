@@ -5,6 +5,10 @@ Description: Very simple pagination plugin based on form
 Version: 1.0
 Author: Rafał Kukawski
 Author URI: https://kukawski.net
+License: GPLv2
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Requires at least: 3.9
+Requires PHP: 5.3
 Text Domain: wp-pagination-form
 */
 
