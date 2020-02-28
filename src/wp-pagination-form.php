@@ -12,6 +12,11 @@ Requires PHP: 5.3
 Text Domain: wp-pagination-form
 */
 
+// exit if not called as part of WordPress
+if (!defined('ABSPATH')) {
+  exit;
+}
+
 add_action('init', function () {
   if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['go_to_page'])) {
     wp_redirect(get_pagenum_link($_POST['go_to_page']));
