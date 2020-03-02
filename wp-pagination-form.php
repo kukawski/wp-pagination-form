@@ -29,14 +29,14 @@ add_action('plugins_loaded', function () {
   load_plugin_textdomain('wp-pagination-form', FALSE, basename(dirname(__FILE__)) . '/languages/');
 });
 
-function wp_pagination_form () {
+function wp_pagination_form ($previous_posts_link_label = NULL, $next_posts_link_label = NULL) {
   global $wp_query;
 
   $posts_per_page = intval(get_query_var('posts_per_page'));
   $pages_count = absint($wp_query->max_num_pages);
   $current_page = min(max(1, absint(get_query_var('paged', 1))), $pages_count);
 
-  previous_posts_link();
+  previous_posts_link($previous_posts_link_label);
   ?><form method="post" action="">
     <?php
       $size = max(1, floor(log10($pages_count)));
@@ -47,6 +47,6 @@ function wp_pagination_form () {
       );
     ?>
     </form><?php
-  next_posts_link();
+  next_posts_link($next_posts_link_label);
 }
 ?>
