@@ -1,15 +1,16 @@
 <?php
 /*
-Plugin Name: WP Pagination Form
-Description: Very simple pagination plugin based on form
-Version: 1.0
-Author: Rafał Kukawski
-Author URI: https://kukawski.net
-License: GPLv2
-License URI: https://www.gnu.org/licenses/gpl-2.0.html
-Requires at least: 3.9
-Requires PHP: 5.3
-Text Domain: wp-pagination-form
+ * Plugin Name: WP Pagination Form
+ * Description: Very simple pagination based on a form
+ * Version: 1.0
+ * Author: Rafał Kukawski
+ * Author URI: https://kukawski.net
+ * License: GPLv2
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Requires at least: 3.9
+ * Requires PHP: 5.3
+ * Text Domain: wp-pagination-form
+ * Domain Path: /languages
 */
 
 // exit if not called as part of WordPress
@@ -24,6 +25,10 @@ add_action('init', function () {
   }
 });
 
+add_action('plugins_loaded', function () {
+  load_plugin_textdomain('wp-pagination-form', FALSE, basename(dirname(__FILE__)) . '/languages/');
+});
+
 function wp_pagination_form () {
   global $wp_query;
 
@@ -33,7 +38,14 @@ function wp_pagination_form () {
 
   previous_posts_link();
   ?><form method="post" action="">
-    Page <input name="go_to_page" value="<?=$current_page?>" size="<?=floor(log10(abs($pages_count))) + 1?>"> of <?=$pages_count?>
+    <?php
+      $size = max(1, floor(log10(abs($pages_count))));
+      printf(
+        __('Page %1$s of %2$s', 'wp-pagination-form'),
+        "<input name=\"go_to_page\" value=\"$current_page\" size=\"$size\">",
+        $pages_count
+      );
+    ?>
     </form><?php
   next_posts_link();
 }
