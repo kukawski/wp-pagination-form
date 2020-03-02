@@ -46,6 +46,12 @@ add_action('plugins_loaded', function () {
   load_plugin_textdomain('wp-pagination-form', FALSE, basename(dirname(__FILE__)) . '/languages/');
 });
 
+function wp_pagination_form_with_links ($previous_posts_link_label = NULL, $next_posts_link_label = NULL) {
+  previous_posts_link($previous_posts_link_label);
+  wp_pagination_form();
+  next_posts_link($next_posts_link_label);
+}
+
 function wp_pagination_form ($previous_posts_link_label = NULL, $next_posts_link_label = NULL) {
   list($current_page, $total_pages) = get_paging_details();
 
