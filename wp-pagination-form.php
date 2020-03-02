@@ -18,9 +18,22 @@ if (!defined('ABSPATH')) {
   exit;
 }
 
-add_action('init', function () {
+function get_paging_details () {
+  global $wp_query;
+
+  $total_pages = absint($wp_query->max_num_pages);
+  $current_page = min(max(1, absint(get_query_var('paged', 1))), $total_pages);
+
+  return [ $current_page, $total_pages ];
+}
+
+// getting paging details doesn't work in earlier hooks like init or wp_loaded
+add_action('wp', function () {
   if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['go_to_page'])) {
-    wp_redirect(get_pagenum_link($_POST['go_to_page']));
+    list($current_page, $total_pages) = get_paging_details();
+    $goto_page = max(1, min($_POST['go_to_page'], $total_pages));
+
+    wp_redirect(get_pagenum_link($goto_page));
     exit;
   }
 });
@@ -34,11 +47,7 @@ add_action('plugins_loaded', function () {
 });
 
 function wp_pagination_form ($previous_posts_link_label = NULL, $next_posts_link_label = NULL) {
-  global $wp_query;
-
-  $posts_per_page = intval(get_query_var('posts_per_page'));
-  $pages_count = absint($wp_query->max_num_pages);
-  $current_page = min(max(1, absint(get_query_var('paged', 1))), $pages_count);
+  list($current_page, $total_pages) = get_paging_details();
 
   wp_enqueue_style('wp-pagination-form');
 
@@ -46,11 +55,11 @@ function wp_pagination_form ($previous_posts_link_label = NULL, $next_posts_link
   ?><form method="post" action="" class="wp-pagination-form">
       <label>
       <?php
-        $size = max(1, floor(log10($pages_count)));
+        $size = max(1, floor(log10($total_pages)));
         printf(
           __('Page %1$s of %2$s', 'wp-pagination-form'),
           "<input name=\"go_to_page\" value=\"$current_page\" size=\"$size\">",
-          $pages_count
+          $total_pages
         );
       ?>
       </label>
