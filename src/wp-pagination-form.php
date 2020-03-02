@@ -39,7 +39,7 @@ function wp_pagination_form () {
   previous_posts_link();
   ?><form method="post" action="">
     <?php
-      $size = max(1, floor(log10(abs($pages_count))));
+      $size = max(1, floor(log10($pages_count)));
       printf(
         __('Page %1$s of %2$s', 'wp-pagination-form'),
         "<input name=\"go_to_page\" value=\"$current_page\" size=\"$size\">",
