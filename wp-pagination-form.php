@@ -52,12 +52,11 @@ function wp_pagination_form_with_links ($previous_posts_link_label = NULL, $next
   next_posts_link($next_posts_link_label);
 }
 
-function wp_pagination_form ($previous_posts_link_label = NULL, $next_posts_link_label = NULL) {
+function wp_pagination_form () {
   list($current_page, $total_pages) = get_paging_details();
 
   wp_enqueue_style('wp-pagination-form');
 
-  previous_posts_link($previous_posts_link_label);
   ?><form method="post" action="" class="wp-pagination-form">
       <label>
       <?php
@@ -70,6 +69,5 @@ function wp_pagination_form ($previous_posts_link_label = NULL, $next_posts_link
       ?>
       </label>
     </form><?php
-  next_posts_link($next_posts_link_label);
 }
 ?>
