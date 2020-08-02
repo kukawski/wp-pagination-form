@@ -18,6 +18,9 @@ if (!defined('ABSPATH')) {
   exit;
 }
 
+define('WP_PAGINATION_FORM_RENDER_BEFORE_CONTENT', true);
+define('WP_PAGINATION_FORM_RENDER_AFTER_CONTENT', true);
+
 function get_paging_details () {
   global $wp_query;
 
@@ -81,5 +84,17 @@ function wp_pagination_form () {
       ?>
       </label>
     </form><?php
+}
+
+if (defined('WP_PAGINATION_FORM_RENDER_BEFORE_CONTENT') && WP_PAGINATION_FORM_RENDER_BEFORE_CONTENT) {
+  add_action('loop_start', function () {
+    wp_pagination_form_with_links();
+  });
+}
+
+if (defined('WP_PAGINATION_FORM_RENDER_AFTER_CONTENT') && WP_PAGINATION_FORM_RENDER_AFTER_CONTENT) {
+  add_action('loop_end', function () {
+    wp_pagination_form_with_links();
+  });
 }
 ?>
