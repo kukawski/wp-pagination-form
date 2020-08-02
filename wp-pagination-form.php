@@ -2,7 +2,7 @@
 /*
  * Plugin Name: WP Pagination Form
  * Description: Very simple pagination based on a form
- * Version: 1.0
+ * Version: 1.0.1
  * Author: Rafał Kukawski
  * Author URI: https://kukawski.net
  * License: GPLv2
@@ -47,13 +47,25 @@ add_action('plugins_loaded', function () {
 });
 
 function wp_pagination_form_with_links ($previous_posts_link_label = NULL, $next_posts_link_label = NULL) {
+  if (is_singular()) {
+    return;
+  }
+
   previous_posts_link($previous_posts_link_label);
   wp_pagination_form();
   next_posts_link($next_posts_link_label);
 }
 
 function wp_pagination_form () {
+  if (is_singular()) {
+    return;
+  }
+
   list($current_page, $total_pages) = get_paging_details();
+
+  if ($total_pages < 1) {
+    return;
+  }
 
   wp_enqueue_style('wp-pagination-form');
 
