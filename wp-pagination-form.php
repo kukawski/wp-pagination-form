@@ -18,9 +18,9 @@ if (!defined('ABSPATH')) {
   exit;
 }
 
-define('WP_PAGINATION_FORM_RENDER_BEFORE_CONTENT', true);
-define('WP_PAGINATION_FORM_RENDER_AFTER_CONTENT', true);
-define('WP_PAGINATION_FORM_RENDER_LINKS', true);
+define('WP_PAGINATION_FORM_RENDER_BEFORE_CONTENT', false);
+define('WP_PAGINATION_FORM_RENDER_AFTER_CONTENT', false);
+define('WP_PAGINATION_FORM_RENDER_LINKS', false);
 
 function get_paging_details () {
   global $wp_query;
