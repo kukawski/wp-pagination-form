@@ -18,8 +18,6 @@ if (!defined('ABSPATH')) {
   exit;
 }
 
-define('WP_PAGINATION_FORM_RENDER_LINKS', false);
-
 function get_paging_details () {
   global $wp_query;
 
@@ -46,11 +44,12 @@ add_action('init', function () {
 
 add_action('init', function () {
   $pagination_placement = get_option('pagination_placement', 'off');
+  $include_links = get_option('pagination_with_links');
 
   $above = $pagination_placement === 'above_content' || $pagination_placement === 'above_and_below_content';
   $below = $pagination_placement === 'below_content' || $pagination_placement === 'above_and_below_content';
 
-  $with_links = defined('WP_PAGINATION_FORM_RENDER_LINKS') && WP_PAGINATION_FORM_RENDER_LINKS;
+  $with_links = $include_links === '1';
 
   $render_pagination = function () use ($with_links) {
     if ($with_links) {
@@ -145,9 +144,25 @@ add_action('admin_init', function () {
     'wp-pagination-form-placement'
   );
 
+  add_settings_field(
+    'pagination_with_links',
+    '<label for="pagination_with_links">' . esc_html__('Display links in pagination?', 'wp-pagination-form') . '</label>',
+    function () {
+      $with_links = get_option('pagination_with_links', 0);
+      ?><input type="checkbox" name="pagination_with_links" id="pagination_with_links" value="1" <?php checked($with_links, 1) ?>><?php
+    },
+    'wp-pagination-form-options',
+    'wp-pagination-form-placement'
+  );
+
   register_setting(
     'wp-pagination-form-options',
     'pagination_placement'
+  );
+
+  register_setting(
+    'wp-pagination-form-options',
+    'pagination_with_links'
   );
 });
 
