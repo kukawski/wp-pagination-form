@@ -53,7 +53,12 @@ add_action('init', function () {
 
   $render_pagination = function () use ($with_links) {
     if ($with_links) {
-      wp_pagination_form_with_links();
+      // ?: will cast '0' to NULL. OK for now
+      // because it's unlikely that somebody adds such label
+      $prev_link_text = get_option('pagination_prev_page_link_text', '') ?: NULL;
+      $next_link_text = get_option('pagination_next_page_link_text', '') ?: NULL;
+
+      wp_pagination_form_with_links($prev_link_text, $next_link_text);
     } else {
       wp_pagination_form();
     }
@@ -144,6 +149,15 @@ add_action('admin_init', function () {
     'wp-pagination-form-placement'
   );
 
+  add_settings_section(
+    'wp-pagination-form-links',
+    __('Links to previous & next page', 'wp-pagination-form'),
+    function () {
+      _e('Adjust pagination link appearance', 'wp-pagination-form');
+    },
+    'wp-pagination-form-options'
+  );
+
   add_settings_field(
     'pagination_with_links',
     '<label for="pagination_with_links">' . esc_html__('Display links in pagination?', 'wp-pagination-form') . '</label>',
@@ -152,7 +166,29 @@ add_action('admin_init', function () {
       ?><input type="checkbox" name="pagination_with_links" id="pagination_with_links" value="1" <?php checked($with_links, 1) ?>><?php
     },
     'wp-pagination-form-options',
-    'wp-pagination-form-placement'
+    'wp-pagination-form-links'
+  );
+
+  add_settings_field(
+    'pagination_prev_page_link_text',
+    '<label for="pagination_prev_page_link_text">' . esc_html__('Previous page link text', 'wp-pagination-form') . '</label>',
+    function () {
+      $prev_link_text = get_option('pagination_prev_page_link_text', '');
+      ?><input type="text" name="pagination_prev_page_link_text" id="pagination_prev_page_link_text" value="<?=esc_attr__($prev_link_text)?>"><?php
+    },
+    'wp-pagination-form-options',
+    'wp-pagination-form-links'
+  );
+
+  add_settings_field(
+    'pagination_next_page_link_text',
+    '<label for="pagination_next_page_link_text">' . esc_html__('Next page link text', 'wp-pagination-form') . '</label>',
+    function () {
+      $next_link_text = get_option('pagination_next_page_link_text', '');
+      ?><input type="text" name="pagination_next_page_link_text" id="pagination_next_page_link_text" value="<?=esc_attr__($next_link_text)?>"><?php
+    },
+    'wp-pagination-form-options',
+    'wp-pagination-form-links'
   );
 
   register_setting(
@@ -163,6 +199,16 @@ add_action('admin_init', function () {
   register_setting(
     'wp-pagination-form-options',
     'pagination_with_links'
+  );
+
+  register_setting(
+    'wp-pagination-form-options',
+    'pagination_prev_page_link_text'
+  );
+
+  register_setting(
+    'wp-pagination-form-options',
+    'pagination_next_page_link_text'
   );
 });
 
