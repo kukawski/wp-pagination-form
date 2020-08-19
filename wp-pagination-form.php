@@ -18,8 +18,6 @@ if (!defined('ABSPATH')) {
   exit;
 }
 
-define('WP_PAGINATION_FORM_RENDER_BEFORE_CONTENT', false);
-define('WP_PAGINATION_FORM_RENDER_AFTER_CONTENT', false);
 define('WP_PAGINATION_FORM_RENDER_LINKS', false);
 
 function get_paging_details () {
@@ -44,6 +42,31 @@ add_action('wp', function () {
 
 add_action('init', function () {
   wp_register_style('wp-pagination-form', plugins_url('wp-pagination-form.css', __FILE__));
+});
+
+add_action('init', function () {
+  $pagination_placement = get_option('pagination_placement', 'off');
+
+  $above = $pagination_placement === 'above_content' || $pagination_placement === 'above_and_below_content';
+  $below = $pagination_placement === 'below_content' || $pagination_placement === 'above_and_below_content';
+
+  $with_links = defined('WP_PAGINATION_FORM_RENDER_LINKS') && WP_PAGINATION_FORM_RENDER_LINKS;
+
+  $render_pagination = function () use ($with_links) {
+    if ($with_links) {
+      wp_pagination_form_with_links();
+    } else {
+      wp_pagination_form();
+    }
+  };
+
+  if ($above) {
+    add_action('loop_start', $render_pagination);
+  }
+
+  if ($below) {
+    add_action('loop_end', $render_pagination);
+  }
 });
 
 add_action('plugins_loaded', function () {
@@ -87,23 +110,61 @@ function wp_pagination_form () {
     </form><?php
 }
 
-if (defined('WP_PAGINATION_FORM_RENDER_BEFORE_CONTENT') && WP_PAGINATION_FORM_RENDER_BEFORE_CONTENT) {
-  add_action('loop_start', function () {
-    if (defined('WP_PAGINATION_FORM_RENDER_LINKS') && WP_PAGINATION_FORM_RENDER_LINKS) {
-      wp_pagination_form_with_links();
-    } else {
-      wp_pagination_form();
-    }
-  });
-}
+add_action('admin_init', function () {
+  add_settings_section(
+    'wp-pagination-form-placement',
+    __('Pagination display', 'wp-pagination-form'),
+    function () {
+      _e('Select where to display the pagination', 'wp-pagination-form');
+    },
+    'wp-pagination-form-options'
+  );
 
-if (defined('WP_PAGINATION_FORM_RENDER_AFTER_CONTENT') && WP_PAGINATION_FORM_RENDER_AFTER_CONTENT) {
-  add_action('loop_end', function () {
-    if (defined('WP_PAGINATION_FORM_RENDER_LINKS') && WP_PAGINATION_FORM_RENDER_LINKS) {
-      wp_pagination_form_with_links();
-    } else {
-      wp_pagination_form();
-    }
+  add_settings_field(
+    'pagination_placement',
+    '<label for="pagination_placement">' . __('Pagination placement', 'wp-pagination-form') . '</label>',
+    function () {
+      $options = [
+        // value => translation key
+        'off' => 'No pagination',
+        'below_content' => 'Below content',
+        'above_content' => 'Above content',
+        'above_and_below_content' => 'Above & below content'
+      ];
+      $default_option = 'off';
+      $selected_option = get_option('pagination_placement', $default_option);
+
+      ?><select id="pagination_placement" name="pagination_placement"><?php
+      foreach ($options as $key => $label) :
+        ?><option value="<?=esc_attr($key)?>" <?php selected($key, $selected_option) ?>>
+          <?=esc_html__($label)?>
+        </option><?php
+      endforeach;
+    },
+    'wp-pagination-form-options',
+    'wp-pagination-form-placement'
+  );
+
+  register_setting(
+    'wp-pagination-form-options',
+    'pagination_placement'
+  );
+});
+
+add_action('admin_menu', function () {
+  add_options_page(__('Pagination', 'wp-pagination-form'), __('Pagination', 'wp-pagination-form'), 'manage_options', 'wp-pagination-form-options', function () {
+    ?>
+    <div class="wrap">
+      <h1><?php _e('Pagination', 'wp-pagination-form') ?></h1>
+      <form method="post" action="options.php">
+        <?php
+          settings_fields('wp-pagination-form-options');
+          do_settings_sections('wp-pagination-form-options');
+        ?>
+        <div><?php submit_button(); ?></div>
+      </form>
+    </div>
+    <?php
   });
-}
+});
 ?>
